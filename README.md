@@ -19,6 +19,16 @@ To install the necessary requirements, download the `requirements.txt` file and 
 pip install -r requirements.txt
 ```
 
+In your `settings.json` file, make sure to set the variables `nac-copilot.ansibleLintPath`, `nac-copilot.yamalePath`, and `nac-copilot.varsFilePath` to the full paths.
+Here is an example of what your `settings.json` file should look like. Do not copy and paste this code, since it is different for each device.
+```bash
+{
+  "nac-copilot.ansibleLintPath": "/Users/yamrao/Library/Python/3.9/bin/ansible-lint",
+  "nac-copilot.yamalePath": "/Users/yamrao/Library/Python/3.9/bin/yamale",
+  "nac-copilot.varsFilePath": "/Users/yamrao/Desktop/Extension Demo/site_hierarchy/vars/site_hierarchy_design_vars.yml"
+}
+```
+
 ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.

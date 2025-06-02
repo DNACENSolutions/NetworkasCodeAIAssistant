@@ -1,0 +1,79 @@
+{
+  "name": "nac-copilot",
+  "displayName": "NaC_CoPilot",
+  "description": "Network as Code (NaC) CoPilot",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.100.2"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "chat-tutorial.code-assistant",
+        "fullName": "Code Assistant",
+        "name": "assistant",
+        "description": "What can I help you with?",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "playbook",
+            "description": "Identify what playbook to use for a specific task."
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "code-assistant.annotate",
+        "title": "Toggle Assistant Annotations",
+        "icon": "$(comment)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "code-assistant.annotate",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "NaC Copilot Configuration",
+      "properties": {
+        "nac-copilot.ansibleLintPath": {
+          "type": "string",
+          "default": "ansible-lint",
+          "description": "Path to the ansible-lint executable. Use 'ansible-lint' if it is in your PATH, or provide the full path."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.81.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "axios": "^1.9.0"
+  }
+}

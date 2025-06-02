@@ -14,7 +14,8 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+To install the necessary requirements, download the requirements.txt file and run the following command:
+/* pip install -r requirements.txt */
 
 ## Extension Settings
 

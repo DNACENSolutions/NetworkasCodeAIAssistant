@@ -19,7 +19,7 @@ To install the necessary requirements, download the `requirements.txt` file and 
 pip install -r requirements.txt
 ```
 
-In your `settings.json` file, make sure to set the variables `nac-copilot.ansibleLintPath`, `nac-copilot.yamalePath`, and `nac-copilot.varsFilePath` to the full paths to these executables.
+In your `settings.json` file, make sure to set the variables `nac-copilot.ansibleLintPath`, `nac-copilot.yamalePath`, and `nac-copilot.varsFilePath` to the full paths to these executables. For instance, you can find the ansible-lint paths using the terminal command `where ansible-lint`.
 
 Here is an example of what your `settings.json` file should look like. Do not copy and paste this code, since it is different for each device.
 

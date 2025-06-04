@@ -19,12 +19,7 @@
         "name": "assistant",
         "description": "What can I help you with?",
         "isSticky": true,
-        "commands": [
-          {
-            "name": "playbook",
-            "description": "Identify what playbook to use for a specific task."
-          }
-        ]
+        "commands": []
       }
     ],
     "commands": [
@@ -50,6 +45,16 @@
           "type": "string",
           "default": "ansible-lint",
           "description": "Path to the ansible-lint executable. Use 'ansible-lint' if it is in your PATH, or provide the full path."
+        },
+        "nac-copilot.varsFilePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the vars file. Please provide the full path."
+        },
+        "nac-copilot.yamalePath": {
+          "type": "string",
+          "default": "yamale",
+          "description": "Path to the yamale executable. Use 'yamale' if it is in your PATH, or provide the full path."
         }
       }
     }

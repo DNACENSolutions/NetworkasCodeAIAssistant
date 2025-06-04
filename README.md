@@ -14,7 +14,22 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+To install the necessary requirements, download the `requirements.txt` file and run the following command:
+```bash
+pip install -r requirements.txt
+```
+
+In your `settings.json` file, make sure to set the variables `nac-copilot.ansibleLintPath`, `nac-copilot.yamalePath`, and `nac-copilot.varsFilePath` to the full paths to these executables. For instance, you can find the ansible-lint paths using the terminal command `where ansible-lint`.
+
+Here is an example of what your `settings.json` file should look like. Do not copy and paste this code, since it is different for each device.
+
+```bash
+{
+  "nac-copilot.ansibleLintPath": "/Users/yamrao/Library/Python/3.9/bin/ansible-lint",
+  "nac-copilot.yamalePath": "/Users/yamrao/Library/Python/3.9/bin/yamale",
+  "nac-copilot.varsFilePath": "/Users/yamrao/Desktop/Extension Demo/site_hierarchy/vars/site_hierarchy_design_vars.yml"
+}
+```
 
 ## Extension Settings
 

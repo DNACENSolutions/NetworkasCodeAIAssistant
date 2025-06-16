@@ -34,12 +34,21 @@
         "command": "code-assistant.annotate",
         "title": "Toggle Assistant Annotations",
         "icon": "$(comment)"
+      },
+      {
+        "command": "check-yamale-syntax",
+        "title": "Check Yamale Syntax",
+        "icon": "$(check)"
       }
     ],
     "menus": {
       "editor/title": [
         {
           "command": "code-assistant.annotate",
+          "group": "navigation"
+        },
+        {
+          "command": "check-yamale-syntax",
           "group": "navigation"
         }
       ]

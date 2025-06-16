@@ -21,7 +21,12 @@
         "name": "assistant",
         "description": "What can I help you with?",
         "isSticky": true,
-        "commands": []
+        "commands": [
+          {
+            "name": "ask",
+            "description": "Ask questions about specific playbooks and workflows."
+          }
+        ]
       }
     ],
     "commands": [

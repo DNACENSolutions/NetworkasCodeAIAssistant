@@ -71,6 +71,16 @@
           "type": "string",
           "default": "yamale",
           "description": "Path to the yamale executable. Use 'yamale' if it is in your PATH, or provide the full path."
+        },
+        "nac-copilot.yamlLintPath": {
+          "type": "string",
+          "default": "yamllint",
+          "description": "Path to the yamllint executable. Use 'yamllint' if it is in your PATH, or provide the full path."
+        },
+        "nac-copilot.gitPath": {
+          "type": "string",
+          "default": "git",
+          "description": "Path to the git executable. Use 'git' if it is in your PATH, or provide the full path."
         }
       }
     }

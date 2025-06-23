@@ -25,6 +25,10 @@
           {
             "name": "ask",
             "description": "Ask questions about specific workflows."
+          },
+           {
+            "name": "validate",
+            "description": "Provide code to validate."
           }
         ]
       }

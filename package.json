@@ -3,6 +3,7 @@
   "displayName": "NaC_CoPilot",
   "description": "Network as Code (NaC) CoPilot",
   "version": "0.0.1",
+  "type": "module",
   "engines": {
     "vscode": "^1.100.2"
   },
@@ -26,7 +27,7 @@
             "name": "ask",
             "description": "Ask questions about specific workflows."
           },
-           {
+          {
             "name": "validate",
             "description": "Provide code to validate."
           }
@@ -99,7 +100,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
+    "@types/node": "^20.19.1",
     "@types/vscode": "^1.100.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
@@ -109,8 +110,12 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@huggingface/inference": "^4.0.6",
+    "@langchain/community": "^0.3.47",
     "@xenova/transformers": "^2.17.2",
     "axios": "^1.9.0",
-    "cohere-ai": "^7.17.1"
+    "cohere-ai": "^7.17.1",
+    "langchain": "^0.3.29",
+    "onnxruntime-node": "^1.22.0-rev"
   }
 }

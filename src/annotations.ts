@@ -2,20 +2,22 @@ import * as vscode from 'vscode';
 import { exec } from 'child_process';
 import { workflow, validation_schema, validation_schema_file, playbook, getVarsFiles } from './extension.js';
 
-// current active decorations / annotations to display
+// global state variables shared across annotations functions
 let activeDecorations: vscode.TextEditorDecorationType[] = []; 
 const decoratedLines = new Set<number>();
 
+/**
+ * Generates annotations for YAML vars file using Yamale validation schema: 
+ * Retrieves validation schema file, runs yamale command on vars file, and generates annotations based on yamale output.
+ * Returns Yamale output message.
+ */
 async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true, tempFilePath: string = ""): Promise<string> {
-    // get schema validation file path
-    console.log('Checking file syntax with yamale...');
+    // get schema validation file path from cloned GitHub repo in user's workspace
     let validationFilePath = "";
     const uris = await vscode.workspace.findFiles("**/updated-catalyst-center-ansible-iac/**/*_schema.yml");
     const fileNames = uris.map(uri => uri.fsPath);
-    console.log(fileNames[0]);
-    console.log("files: ", fileNames);
 
-    // identify schema file path from all documents 
+    // identify schema file path from all file paths 
     for (const f of fileNames) {
         if (f.includes(validation_schema_file)) {
             validationFilePath = f;
@@ -23,6 +25,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
         }
     }
 
+    // identify vars file path from text editor or temp file path parameter 
     let varsFilePath = "";
     if (tempFilePath) {
         varsFilePath = tempFilePath;
@@ -30,28 +33,23 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
         varsFilePath = textEditor.document.uri.fsPath;
     }
 
-    console.log("validation file path for yamale: ", validationFilePath);
-
-    // validation variables for yamale annotations
+    // validation variables for Yamale annotations
     let validationFailed = false;
     let validationError = "";
     let numSuggestions = -1;
     let formattedYamaleErrors: string[] = [];
 
-    // get yamale path
+    // get Yamale path from user's configuration
     const yamalePath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamalePath');
-    console.log('yamale path: ', yamalePath);
 
-    // run yamale command using schema and vars files
+    // run Yamale terminal command using validation schema and vars files
     let yamaleOutputMessage: string = "";
     await new Promise<void>((resolve, reject) => {
         exec(`"${yamalePath}" -s "${validationFilePath}" -v "${varsFilePath}"`, (error: any, stdout: string, stderr: string) => {
-            console.log('yamale errors: ', stderr);
-            console.log('yamale output: ', stdout);
             if (stdout) {
                 yamaleOutputMessage = stdout;
             }
-            // if errors, send message logging them
+            // if errors, send message to user logging them
             if (stderr) {
                 let yamaleErrorOutput = stderr.split('\n').filter(line => line.trim() !== '');
                 yamaleErrorOutput = yamaleErrorOutput.slice(yamaleErrorOutput.length-2);
@@ -59,24 +57,21 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                 for (const e of yamaleErrorOutput) {
                     error += e;
                 }
-                console.log('yamale error output: ', error);
                 yamaleOutputMessage = error;
+                // if displaying annotations, notify user of validation error through error message
                 if (annotations) {
-                    // display error message as an error message block
                     vscode.window.showErrorMessage(`Validation Error: ${error}`);
                 }
             } else if (stdout.includes("Validation failed!")) {
                 const yamaleOutput = stdout.split('\n').filter(line => line.trim() !== '').slice(1);
-                console.log('yamale output: ', yamaleOutput);
 
                 let error = "";
                 for (const e of yamaleOutput.slice(1)) {
                     error += e + "\n";
                     numSuggestions += 1;
                 }
-                console.log('yamale error output: ', error);
                 yamaleOutputMessage = error;
-                // display error message in information message and output channel 
+                // if displaying annotations, notify user of validation error through error message & output channel
                 if (annotations) {
                     vscode.window.showErrorMessage(`Validation Failed: Check output channel for details.`);
                     const outputChannel = vscode.window.createOutputChannel('NaC Copilot');
@@ -87,12 +82,11 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                     formattedYamaleErrors = yamaleOutput.slice(2);
                 }
             } else {
-                // no errors --> print success statement 
+                // if no errors, display success statement
                 const yamaleOutput = stdout.split('\n').filter(line => line.trim() !== '').slice(1);
-                console.log('yamale output: ', yamaleOutput);
 
+                // if displaying annotations, clear all active decorations & display success message
                 if (annotations) {
-                    // Clear all active decorations if validation is successful
                     for (const d of activeDecorations) {
                         textEditor.setDecorations(d, []);
                         d.dispose();
@@ -100,7 +94,6 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                     activeDecorations = [];
                     decoratedLines.clear();
 
-                    // display return message as a notification block
                     vscode.window.showInformationMessage(yamaleOutput[0]);
                 }
             }
@@ -109,16 +102,12 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
     });
 
     if (annotations) {
-        console.log("before trying to generate yamale annotations");
-        console.log("validation failed: ", validationFailed);
-        console.log("validation error: ", validationError);
-        console.log("num suggestions: ", numSuggestions);
+        // if validation failed, generate annotations based on Yamale output
         if (validationFailed && validationError) {
-            console.log("validation failure detected, generating annotations...");
-            // get vars files for later use
+            // get sample vars files for later use
             const varsFiles = await getVarsFiles(workflow, true, playbook);
 
-            // generate code annotation based on yamale error output
+            // LLM prompt for generating annotations
             const ERROR_PROMPT = `You are a code assistant who helps customers fix their YAML code based on Yamale validation errors. 
             Your ONLY job is to annotate lines that match the error specified in the Yamale error output. 
             DO NOT annotate all lines, only annotate lines/sections that DIRECTLY relate to the validation error output provided.
@@ -155,6 +144,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
 
             const messages = [vscode.LanguageModelChatMessage.User(message_content)];
 
+            // send request to Copilot LLM model
             try {
                 const chatResponse = await vscode.window.withProgress({
                     location: vscode.ProgressLocation.Notification,
@@ -171,24 +161,21 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                     return await model.sendRequest(messages, {}, new vscode.CancellationTokenSource().token);
                 });
 
+                // if chatResponse received, parse suggestions as a list
                 if (chatResponse) {
-                    console.log("Annotations chat response received: ", chatResponse);
-
-                    // parse chatResponse suggestions as a list
                     let accumulatedChatResponse = '';
 
                     for await (const fragment of chatResponse.text) {
                         accumulatedChatResponse += fragment;
                     }
 
-                    console.log("Accumulated chat response: ", accumulatedChatResponse);
-
                     // convert chatResponse to a list of strings
                     const accumulatedChatResponseList: string[] = JSON.parse(accumulatedChatResponse);
 
-                    // retrieve line numbers for suggestions (list)
+                    // retrieve line numbers for suggestions as a list
                     const lineNumbers = await yamaleAnnotationLines(formattedYamaleErrors, textEditor);
 
+                    // format response as JSON objects with line numbers & suggestions
                     let response = "";
                     for (let i = 0; i < lineNumbers.length; i++) {
                         response += `{ "line": ${lineNumbers[i]}, "suggestion": "${accumulatedChatResponseList[i]}" } `;
@@ -196,13 +183,12 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                     if (lineNumbers.length === 0) {
                         response = "{}";
                     }
-
-                    console.log("Response from chat model w/ found line #s: ", response);
                     
+                    // parse chat response to apply annotations to code
                     await parseChatResponse(response, textEditor);
                 }
             } catch (error) {
-                console.error("Error sending request to chat model:", error);
+                console.error("Error generating Yamale code annotations using Copilot LLM model: ", error);
                 vscode.window.showErrorMessage('Failed to get annotations from the model. Please try again.');
             }
         }
@@ -210,40 +196,44 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
     return yamaleOutputMessage;
 }
 
+/**
+ * Identified line numbers for Yamale annotations based on validation schema error output: 
+ * Utilizes format of Yamale error output message to identify appropriate field lines to annotate.
+ * Returns line numbers as a list of numbers per validation error.
+ */
 async function yamaleAnnotationLines(response: string[], textEditor: vscode.TextEditor): Promise<number[]> {
     let lines: number[] = [];
     const codeWithLineNumbers = getVisibleCodeWithLineNumbers(textEditor);
 
     for (const r of response) {
-        // separate r by "."
+        // separate each error response by "." to get separated fields
         const parts = r.split(":")[0].split(".");
-        console.log("parts: ", parts);
 
-        // if just 1 part, line 1
+        // if just 1 part, add suggestion to line 1
         if (parts.length === 1) {
             lines.push(1);
             continue;
         } else if (parts.length > 1) {
             let keyParts: string[];
+            // if error response includes "missing", add annotation to parent field
             if (r.includes("missing")) {
-                // omit last part if field missing & find location of second to last part 
+                // find location of second to last part if field missing
                 keyParts = parts.slice(0, -1);
             } else {
                 // else keep all parts
                 keyParts = parts;
             }
-            console.log("key parts: ", keyParts);
 
             let currentLine = 1;
             for (const p of keyParts) {
-                console.log(`current line for ${p}: ${currentLine}`);
                 // check if part is a number
                 if (isNaN(parseInt(p, 10))) {
-                    // find p in code
+                    // find part p in code starting from currentLine
                     const splitCodeLines = codeWithLineNumbers.split('\n');
                     for(let i = currentLine; i < splitCodeLines.length; i++) {
                         const lineWithoutNumber = splitCodeLines[i].replace(/^\d+:\s*/, '');
 
+                        // if line contains part p, set currentLine to this line & proceed to next part
                         if (lineWithoutNumber.trim().includes(p)) {
                             // retrieve line number of this line
                             const matchLine = splitCodeLines[i].match(/^\d+/);
@@ -254,7 +244,7 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
                         }
                     }
                 } else {
-                    // find pth "-" after currentLine in code
+                    // if part is a number, find pth "-" after currentLine
                     let numDashes = 0;
                     const splitCodeLines = codeWithLineNumbers.split('\n');
                     let foundFirstElem = false;
@@ -263,7 +253,9 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
                     for(let i = currentLine; i < splitCodeLines.length; i++) {
                         const lineWithoutNumber = splitCodeLines[i].replace(/^\d+:\s*/, '');
 
+                        // if line starts with "-", check if it matches current list indentation
                         if (lineWithoutNumber.trim().startsWith('-')) {
+                            // find indentation of first list element for future matching
                             if (!foundFirstElem) {
                                 const matchIndent = lineWithoutNumber.match(/^(\s*)-/);
                                 if (matchIndent) {
@@ -272,8 +264,9 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
                                 }
                             }
 
+                            // if number of dashes matches p & indentation matches, set currentLine to this line
                             if (numDashes === parseInt(p, 10) && lineWithoutNumber.startsWith(indentation + "-")) {
-                                // found matching dashed line
+                                // retrieve line number of this line
                                 const matchLine = splitCodeLines[i].match(/^\d+/);
                                 if (matchLine) {
                                     currentLine = parseInt(matchLine[0], 10);
@@ -285,51 +278,51 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
                     }
                 }
             }
+            // add line found after parsing all parts to annotation lines
             lines.push(currentLine);
         }
     }
-    console.log("lines for yamale annotations: ", lines);
     return lines;
 }
 
+/**
+ * Generates annotations for YAML vars file using YAMLlint and Ansible Lint: 
+ * Retrieves vars file, runs yamllint & ansible-lint commands on vars file, and generates annotations based on output.
+ * Returns YAMLlint & Ansible Lint output messages as a list of strings
+ */
 async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boolean = true): Promise<string[]> {
-    // get file extension
-    console.log('Checking file syntax with ansible-lint & yamllint ...');
-    const filePath = textEditor.document.uri.fsPath;
-    console.log('File path: ', filePath);
-    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+    // identify vars file path from text editor
+    const varsFilePath = textEditor.document.uri.fsPath;
+    const varsFileExtension = varsFilePath.split('.').pop()?.toLowerCase();
 
-    // get ansible-lint & yamllint command paths
+    // get Ansible Lint & YAMLlint paths from user's configuration
     const ansibleLintPath = vscode.workspace.getConfiguration('nac-copilot').get<string>('ansibleLintPath');
-    console.log('Ansible-lint path: ', ansibleLintPath);
     const yamlLintPath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamlLintPath');
-    console.log('Ansible-lint path: ', yamlLintPath);
 
     let lintOutput = ["", ""];
 
-    // check if file is YAML file
-    if (fileExtension == 'yaml' || fileExtension == 'yml') {
-        // run ansible-lint command on file
+    // ensure that vars file is YAML file
+    if (varsFileExtension == 'yaml' || varsFileExtension == 'yml') {
+        // run ansible-lint terminal command on vars file
         await new Promise<void>((resolve, reject) => {
-            exec(`"${ansibleLintPath}" "${filePath}"`, (error: any, stdout: string, stderr: string) => {
-                // console.log('ansible-lint output: ', stdout);
+            exec(`"${ansibleLintPath}" "${varsFilePath}"`, (error: any, stdout: string, stderr: string) => {
+                // if no errors, get output
                 if (stdout) {
-                    // get ansible-lint output 
                     lintOutput[0] = stdout;
                     const ansibleLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
 
+                    // if displaying annotations, generate annotations based on Ansible Lint output
                     if (annotations) {
-                        // generate annotations based on ansible-lint output
                         for (let i = 0; i < ansibleLintOutput.length; i+=2) {
                             const message = ansibleLintOutput[i];
                             const file = ansibleLintOutput[i+1];
-                            // extract line number and message from ansible-lint output
-                            // ansible-lint output format: "filename:line_number: message"
+                            // extract line number and message from output
+                            // Ansible Lint output format: "filename:line_number: message"
                             const match = file.match(/:(\d+)$/);
                             if (match) {
                                 const lineNumber = parseInt(match[1], 10);
                                 const suggestion = message;
-                                // apply decoration to text editor
+                                // apply decoration to text editor to generate annotations
                                 applyDecoration(textEditor, lineNumber, suggestion);
                             }
                         }
@@ -339,24 +332,24 @@ async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boole
             });
         });
 
+        // run yamllint terminal command on vars file
         await new Promise<void>((resolve, reject) => {
-            exec(`"${yamlLintPath}" "${filePath}"`, (error: any, stdout: string, stderr: string) => {
+            exec(`"${yamlLintPath}" "${varsFilePath}"`, (error: any, stdout: string, stderr: string) => {
+                // if no errors, get output
                 if (stdout) {
-                    // get yamllint output 
                     lintOutput[1] = stdout;
                     const yamlLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
-                    console.log('yamllint output: ', yamlLintOutput);
 
+                    // if displaying annotations, generate annotations based on YAMLlint output
                     if (annotations) {
-                    // generate annotations based on yamllint output
+                        // YAMLlint output format: "line_number:column_number: [level] message"
                         for (let i = 1; i < yamlLintOutput.length; i+=1) {
                             const message = yamlLintOutput[i];
                             const output = message.split('  ').filter(entry => entry !== '');
                             const lineNumber = parseInt(output[0].split(':')[0]);
                             const suggestion = "[yamllint]: " + output[2];
 
-                            console.log(`line ${lineNumber}: ${suggestion}`);
-                            // apply decoration to text editor
+                            // apply decoration to text editor to generate annotations
                             applyDecoration(textEditor, lineNumber, suggestion);
                         }
                     }
@@ -369,12 +362,15 @@ async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boole
     return lintOutput;
 }
 
+/**
+ * Applies decoration to text editor for a specific line with an annotation suggestion.
+ */
 function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: string) {
-	const badKeywords = ['indent', 'indented', 'align']
-	// skip if line already has decoration
-	if (decoratedLines.has(line) || badKeywords.some(keyword => suggestion.toLowerCase().includes(keyword))) {
+	// skip if line already has decoration to not overload user
+	if (decoratedLines.has(line)) {
 		return;
 	}
+    // create decoration type if it doesn't already exist
 	const decorationType = vscode.window.createTextEditorDecorationType({
 		after: {
 			contentText: ` ${suggestion}`,
@@ -382,13 +378,11 @@ function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: st
 		}
 	});
 
-	// add decoration type to active decorations
+	// add decoration type to active decorations & line to decorated lines (global states)
 	activeDecorations.push(decorationType);
-
-	// add line to decorated lines
 	decoratedLines.add(line);
 
-	// get end of line w/ specified line #
+	// get range of specified line based on existing code in text editor
 	const lineLength = editor.document.lineAt(line - 1).text.length;
 	const range = new vscode.Range(
 		new vscode.Position(line - 1, lineLength),
@@ -398,14 +392,18 @@ function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: st
 	// show full message when user hovers over the message
 	const decoration = {range: range, hoverMessage: suggestion};
 
+    // add annotation decoration to text editor
 	editor.setDecorations(decorationType, [decoration]);
 }
 
+/**
+ * Parses chat response as JSON objects of line numbers & suggestions.
+ */
 async function parseChatResponse(
 	response: string,
 	textEditor: vscode.TextEditor
 ) {
-	// clear previous decorations
+	// clear previous annotations from text editor
 	for (const d of activeDecorations) {
         textEditor.setDecorations(d, []);
         d.dispose();
@@ -413,49 +411,39 @@ async function parseChatResponse(
     activeDecorations = [];
     decoratedLines.clear();
 
-	console.log("Accumulated chat response: ", response);
-
+    // if response is empty or contains only empty objects, notify user that no annotations are needed
 	if (response.includes('{}') && decoratedLines.size === 0) {
 		vscode.window.showInformationMessage('No annotations needed. Your code is valid!');
 	} else {
+        // match all JSON objects in the response string: {line: <line_number>, suggestion: <suggestion>}
 		const regex = /{[^}]*}/g;
 		let match;
 
+        // while additional JSON objects exist in response, parse them & apply annotations
 		while((match = regex.exec(response)) !== null) {
 			const jsonString = match[0];
 			try {
 				const annotation = JSON.parse(jsonString);
 				if (!annotation.suggestion.includes("{}")) {
-					const lineLength = textEditor.document.lineAt(annotation.line - 1).text.length;
-					const range = new vscode.Range(
-						new vscode.Position(annotation.line - 1, lineLength),
-						new vscode.Position(annotation.line - 1, lineLength)
-					);
-					
-					const decorationType = vscode.window.createTextEditorDecorationType({
-						after: {
-							contentText: ` ${annotation.suggestion}`,
-							color: 'grey'
-						}
-					});
-					textEditor.setDecorations(decorationType, [range]);
-					activeDecorations.push(decorationType);
-					decoratedLines.add(annotation.line);
+					applyDecoration(textEditor, annotation.line, annotation.suggestion);
 				}
 			} catch (e) {
-				console.error('Failed to parse JSON string:', jsonString, e);
+				console.error('Failed to parse JSON string for annotations: ', jsonString, e);
 			}
 		}
 	}
 }
 
+/**
+ * Retrieves code in current text editor with each line of code prefixed by its line number.
+ * Returns code as a string with line numbers.
+ */
 function getVisibleCodeWithLineNumbers(textEditor: vscode.TextEditor) {
 	let code = '';
 	const totalLines = textEditor.document.lineCount;
 
-	// get text from line @ current position
+    // iterate though all lines in text editor to get code by line number
 	for (let i = 0; i < totalLines; i++) {
-		// includes indentation spaces
 		code += `${i + 1}: ${textEditor.document.lineAt(i).text} \n`
 	}
 

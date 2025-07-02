@@ -74,7 +74,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                 // if displaying annotations, notify user of validation error through error message & output channel
                 if (annotations) {
                     vscode.window.showErrorMessage(`Validation Failed: Check output channel for details.`);
-                    const outputChannel = vscode.window.createOutputChannel('NaC Copilot');
+                    const outputChannel = vscode.window.createOutputChannel('NaC AI Assistant');
                     outputChannel.appendLine('\nValidation Error:\n' + error);
                     outputChannel.show(true); 
                     validationFailed = true;
@@ -399,10 +399,7 @@ function applyDecoration(editor: vscode.TextEditor, line: number, suggestion: st
 /**
  * Parses chat response as JSON objects of line numbers & suggestions.
  */
-async function parseChatResponse(
-	response: string,
-	textEditor: vscode.TextEditor
-) {
+async function parseChatResponse(response: string, textEditor: vscode.TextEditor) {
 	// clear previous annotations from text editor
 	for (const d of activeDecorations) {
         textEditor.setDecorations(d, []);
@@ -413,7 +410,7 @@ async function parseChatResponse(
 
     // if response is empty or contains only empty objects, notify user that no annotations are needed
 	if (response.includes('{}') && decoratedLines.size === 0) {
-		vscode.window.showInformationMessage('No annotations needed. Your code is valid!');
+		return;
 	} else {
         // match all JSON objects in the response string: {line: <line_number>, suggestion: <suggestion>}
 		const regex = /{[^}]*}/g;

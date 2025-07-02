@@ -6,7 +6,6 @@ import { pipeline } from '@xenova/transformers';
 
 // global state variables shared across RAG functions
 let workflows: string[] = [];
-let fetchedREADMEs: string = "";
 let workflowToREADMEs: { [key: string]: string } = {};
 
 // vector DB for RAG storage

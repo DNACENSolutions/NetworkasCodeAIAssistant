@@ -36,25 +36,25 @@
     ],
     "commands": [
       {
-        "command": "code-assistant.annotate",
-        "title": "Toggle Assistant Annotations",
-        "icon": "$(comment)"
+        "command": "validate-and-lint",
+        "title": "Validate & Lint",
+        "icon": "$(check)"
       },
       {
-        "command": "check-yamale-syntax",
-        "title": "Check Yamale Syntax",
-        "icon": "$(check)"
+        "command": "run-playbook",
+        "title": "Run Playbook",
+        "icon": "$(play)"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "code-assistant.annotate",
-          "group": "navigation"
+          "command": "validate-and-lint",
+          "group": "navigation@1"
         },
         {
-          "command": "check-yamale-syntax",
-          "group": "navigation"
+          "command": "run-playbook",
+          "group": "navigation@2"
         }
       ]
     },

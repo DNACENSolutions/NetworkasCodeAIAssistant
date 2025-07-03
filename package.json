@@ -86,6 +86,16 @@
           "type": "string",
           "default": "git",
           "description": "Path to the git executable. Use 'git' if it is in your PATH, or provide the full path."
+        },
+        "nac-copilot.ansiblePlaybookPath": {
+          "type": "string",
+          "default": "ansible-playbook",
+          "description": "Path to the ansible-playbook executable. Use 'ansible-playbook' if it is in your PATH, or provide the full path."
+        },
+        "nac-copilot.venv": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the virtual environment."
         }
       }
     }

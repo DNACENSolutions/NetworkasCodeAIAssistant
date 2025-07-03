@@ -5,7 +5,7 @@ import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { pipeline } from '@xenova/transformers';
 
 // global state variables shared across RAG functions
-let workflows: string[] = [];
+export let workflows: string[] = [];
 let workflowToREADMEs: { [key: string]: string } = {};
 
 // vector DB for RAG storage
@@ -179,7 +179,7 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
     } catch (error) {
         console.error("Error answering question using Copilot LLM model: ", error);
     }
-    return "Error: Unable to retrieve information. Please try again later.";
+    return "Failed to retrieve information from model. Please try again.";
 }
 
 /**

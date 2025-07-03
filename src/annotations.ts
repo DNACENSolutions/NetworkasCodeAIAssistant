@@ -11,7 +11,13 @@ const decoratedLines = new Set<number>();
  * Retrieves validation schema file, runs yamale command on vars file, and generates annotations based on yamale output.
  * Returns Yamale output message.
  */
-async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true, tempFilePath: string = ""): Promise<string> {
+async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true, tempFilePath: string = ""): Promise<string[]> {
+    // handle case where workflow & validation_schema have not been identified
+    if (!(workflow && validation_schema)) {
+        vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
+        return [];
+    }
+
     // get schema validation file path from cloned GitHub repo in user's workspace
     let validationFilePath = "";
     const uris = await vscode.workspace.findFiles("**/updated-catalyst-center-ansible-iac/**/*_schema.yml");
@@ -38,6 +44,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
     let validationError = "";
     let numSuggestions = -1;
     let formattedYamaleErrors: string[] = [];
+    let successfulValidation = false;
 
     // get Yamale path from user's configuration
     const yamalePath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamalePath');
@@ -83,9 +90,10 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                 }
             } else {
                 // if no errors, display success statement
-                const yamaleOutput = stdout.split('\n').filter(line => line.trim() !== '').slice(1);
+                yamaleOutputMessage = stdout.split('\n').filter(line => line.trim() !== '').slice(1).join('\n');
+                successfulValidation = true;
 
-                // if displaying annotations, clear all active decorations & display success message
+                // if displaying annotations, clear all active decorations
                 if (annotations) {
                     for (const d of activeDecorations) {
                         textEditor.setDecorations(d, []);
@@ -93,8 +101,6 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                     }
                     activeDecorations = [];
                     decoratedLines.clear();
-
-                    vscode.window.showInformationMessage(yamaleOutput[0]);
                 }
             }
             resolve();
@@ -193,7 +199,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
             }
         }
     }
-    return yamaleOutputMessage;
+    return [successfulValidation ? "true" : "false", yamaleOutputMessage];
 }
 
 /**
@@ -426,6 +432,7 @@ async function parseChatResponse(response: string, textEditor: vscode.TextEditor
 				}
 			} catch (e) {
 				console.error('Failed to parse JSON string for annotations: ', jsonString, e);
+                vscode.window.showErrorMessage('Failed to get annotations from the model. Please try again.');
 			}
 		}
 	}

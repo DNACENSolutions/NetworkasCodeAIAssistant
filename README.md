@@ -15,25 +15,24 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 
 # Features
 
-- <u>**AI-Powered Chat Assistance**</u>
-  - **Generate YAML Code:** Use the `@assistant` chat assistant to generate YAML vars files tailored to your task by identifying the best workflow, playbook, and schema.
-  - **Ask Questions:** Use the `@assistant /ask` chat command to get answers to general and technical questions about Catalyst Center, Ansible, and related topics.
-  - **Validate YAML Code:** Use the `@assistant /validate` chat command to validate YAML code using Yamale, Ansible Lint, and YAMLlint.
+### AI-Powered Chat Assistance
+- **Generate YAML Code:** Use the `@assistant` chat assistant to generate YAML vars files tailored to your task by identifying the best workflow, playbook, and schema.
+- **Ask Questions:** Use the `@assistant /ask` chat command to get answers to general and technical questions about Catalyst Center, Ansible, and related topics.
+- **Validate YAML Code:** Use the `@assistant /validate` chat command to validate YAML code using Yamale, Ansible Lint, and YAMLlint.
 
-- <u>**In-Editor Commands**</u>
-  - **Validate & Lint:** Instantly run schema validation and linting on your open vars file, with AI-generated annotations for error fixing.
-  - **Run Playbook:** Execute the appropriate Ansible playbook for your task, automatically integrating with your Catalyst Center and generating comprehensive logs.
+### In-Editor Commands
+- **Validate & Lint:** Instantly run schema validation and linting on your open vars file, with AI-generated annotations for error fixing.
+- **Run Playbook:** Execute the appropriate Ansible playbook for your task, automatically integrating with your Catalyst Center and generating comprehensive logs.
 
-- <u>**Inline YAML Annotations**</u>
-  - Receive inline suggestions and error messages directly in your editor based on validation and linting results.
+### Inline YAML Annotations
+- Receive inline suggestions and error messages directly in your editor based on validation and linting results.
 
-- <u>**Seamless GitHub Integration**</u>
-  - Always access the latest workflows, playbooks, and schemas from the [catalyst-center-ansible-iac](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac) repository.
+### Seamless GitHub Integration
+- Always access the latest workflows, playbooks, and schemas from the [catalyst-center-ansible-iac](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac) repository.
 
-- <u>**Fast, Context-Aware Responses**</u>
-  - Utilizes a Retrieval-Augmented Generation (RAG) approach for rapid, relevant answers.
-  - *NOTE:* The first user prompt after activation or after a GitHub re-clone may take up to 30 seconds due to initialization; all other responses are typically delivered in ~3 seconds.
-
+### Fast, Context-Aware Responses
+- Utilizes a Retrieval-Augmented Generation (RAG) approach for rapid, relevant answers.
+- *NOTE:* The first user prompt after activation or after a GitHub re-clone may take up to 30 seconds due to initialization; all other responses are typically delivered in ~3 seconds.
 
 Below is a consolidated table of the provided commands / actions.
 

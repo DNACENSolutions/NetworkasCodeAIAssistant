@@ -11,7 +11,7 @@ const decoratedLines = new Set<number>();
  * Retrieves validation schema file, runs yamale command on vars file, and generates annotations based on yamale output.
  * Returns Yamale output message.
  */
-async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true, tempFilePath: string = ""): Promise<string[]> {
+async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
     // handle case where workflow & validation_schema have not been identified
     if (!(workflow && validation_schema)) {
         vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
@@ -35,7 +35,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
     let varsFilePath = "";
     if (tempFilePath) {
         varsFilePath = tempFilePath;
-    } else {
+    } else if (textEditor) {
         varsFilePath = textEditor.document.uri.fsPath;
     }
 
@@ -93,8 +93,8 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
                 yamaleOutputMessage = stdout.split('\n').filter(line => line.trim() !== '').slice(1).join('\n');
                 successfulValidation = true;
 
-                // if displaying annotations, clear all active decorations
-                if (annotations) {
+                // if displaying annotations & text editor available, clear all active decorations
+                if (annotations && textEditor) {
                     for (const d of activeDecorations) {
                         textEditor.setDecorations(d, []);
                         d.dispose();
@@ -107,7 +107,7 @@ async function yamale(textEditor: vscode.TextEditor, annotations: boolean = true
         });
     });
 
-    if (annotations) {
+    if (annotations && textEditor) {
         // if validation failed, generate annotations based on Yamale output
         if (validationFailed && validationError) {
             // get sample vars files for later use
@@ -296,9 +296,15 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
  * Retrieves vars file, runs yamllint & ansible-lint commands on vars file, and generates annotations based on output.
  * Returns YAMLlint & Ansible Lint output messages as a list of strings
  */
-async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boolean = true): Promise<string[]> {
-    // identify vars file path from text editor
-    const varsFilePath = textEditor.document.uri.fsPath;
+async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
+
+    // identify vars file path from text editor or temp file path parameter 
+    let varsFilePath = "";
+    if (tempFilePath) {
+        varsFilePath = tempFilePath;
+    } else if (textEditor) {
+        varsFilePath = textEditor.document.uri.fsPath;
+    }
     const varsFileExtension = varsFilePath.split('.').pop()?.toLowerCase();
 
     // get Ansible Lint & YAMLlint paths from user's configuration
@@ -317,8 +323,8 @@ async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boole
                     lintOutput[0] = stdout;
                     const ansibleLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
 
-                    // if displaying annotations, generate annotations based on Ansible Lint output
-                    if (annotations) {
+                    // if displaying annotations & text editor available, generate annotations based on Ansible Lint output
+                    if (annotations && textEditor) {
                         for (let i = 0; i < ansibleLintOutput.length; i+=2) {
                             const message = ansibleLintOutput[i];
                             const file = ansibleLintOutput[i+1];
@@ -346,8 +352,8 @@ async function ansibleYAMLLint(textEditor: vscode.TextEditor, annotations: boole
                     lintOutput[1] = stdout;
                     const yamlLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
 
-                    // if displaying annotations, generate annotations based on YAMLlint output
-                    if (annotations) {
+                    // if displaying annotations & text editor available, generate annotations based on YAMLlint output
+                    if (annotations && textEditor) {
                         // YAMLlint output format: "line_number:column_number: [level] message"
                         for (let i = 1; i < yamlLintOutput.length; i+=1) {
                             const message = yamlLintOutput[i];

@@ -20,7 +20,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
     // get schema validation file path from cloned GitHub repo in user's workspace
     let validationFilePath = "";
-    const uris = await vscode.workspace.findFiles("**/updated-catalyst-center-ansible-iac/**/*_schema.yml");
+    const uris = await vscode.workspace.findFiles("**/ai-assistant-catalyst-center-ansible-iac/**/*_schema.yml");
     const fileNames = uris.map(uri => uri.fsPath);
 
     // identify schema file path from all file paths 
@@ -205,6 +205,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 /**
  * Identified line numbers for Yamale annotations based on validation schema error output: 
  * Utilizes format of Yamale error output message to identify appropriate field lines to annotate.
+ * Example error output: "device.3.type: Required field missing"
  * Returns line numbers as a list of numbers per validation error.
  */
 async function yamaleAnnotationLines(response: string[], textEditor: vscode.TextEditor): Promise<number[]> {

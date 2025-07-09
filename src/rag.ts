@@ -95,6 +95,7 @@ async function retrieveAndGenerateRAGWorkflow(userQuery: string, k: number = 5, 
     // create prompt for LLM (user query + top-K retrieved chunks)
     const topKChunks = topKResults.map((r: any) => r[0].pageContent);
     const topKWorkflows = topKResults.map((r: any) => r[0].metadata?.workflow || "unknown");
+    console.log("Top K workflows: ", topKWorkflows);
 
     const prompt = `You are a helpful code assistant. Your job is to provide the user with YAML code for specific workflows in Catalyst Center. Here is an example of what you should do:
     * Example: User types 'create a new site in Catalyst Center named "Branch-01" in area "West"', you suggest appropriate Catalyst Center Ansible/Terraform models and playbooks with syntax. Let user interact further to accurately define their Network as Code YAML data models.
@@ -132,6 +133,7 @@ async function retrieveAndGenerateRAGWorkflow(userQuery: string, k: number = 5, 
         console.error("Error identifying workflow using Copilot LLM model: ", error);
     }
 
+    console.log("Identified workflow: ", identifiedWorkflow);
     return identifiedWorkflow;
 }
 
@@ -188,7 +190,7 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
  */
 async function fetchREADMEFiles() {
     // retrieve all workflows from cloned GitHub repo in user's workspace
-    const workflowsDir = `${vscode.workspace.rootPath}/updated-catalyst-center-ansible-iac/workflows/`;
+    const workflowsDir = `${vscode.workspace.rootPath}/ai-assistant-catalyst-center-ansible-iac/workflows/`;
     const workflowNames = await fs.readdirSync(workflowsDir);
 
     // check if fetched READMEs includes all repo workflows
@@ -201,11 +203,11 @@ async function fetchREADMEFiles() {
 
     // for each workflow, retrieve README file content (if exists)
     for (const w of workflowNames) {
-        const readmeUri = await vscode.workspace.findFiles(`**/updated-catalyst-center-ansible-iac/workflows/${w}/README.md`);
+        const readmeUri = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${w}/README.md`);
         if (readmeUri.length) {
             const readme = (await vscode.workspace.fs.readFile(vscode.Uri.file(readmeUri[0].fsPath))).toString();
             // retrieve names of playbooks in workflow
-            const uris = await vscode.workspace.findFiles(`**/updated-catalyst-center-ansible-iac/workflows/${w}/playbook/*_playbook.yml`);
+            const uris = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${w}/playbook/*_playbook.yml`);
             const playbooks = uris.map(uri => uri.fsPath.replace(/^.*[\\/]/, ''));
 
             // add workflow & README to mapping

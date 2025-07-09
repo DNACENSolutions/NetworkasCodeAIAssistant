@@ -29,6 +29,7 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 
 ### Seamless GitHub Integration
 - Always access the latest workflows, playbooks, and schemas from the [catalyst-center-ansible-iac](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac) repository.
+- *NOTE:* By default, the most updated version of the `catalyst-center-ansible-iac` repository is cloned. 
 
 ### Fast, Context-Aware Responses
 - Utilizes a Retrieval-Augmented Generation (RAG) approach for rapid, relevant answers.
@@ -47,6 +48,12 @@ Below is a consolidated table of the provided commands / actions.
 
 ---
 
+# Important Note
+
+- As mentioned above in the features, the latest version of the `catalyst-center-ansible-iac` repository is automatically cloned into your workspace as `ai-assistant-catalyst-center-ansible-iac`. **Please do not modify this folder**, as it is managed by the extension and used to support its functionality.
+
+---
+
 # Prerequisites
 
 Before continuing, please ensure you have the following prerequisites:
@@ -57,7 +64,7 @@ Before continuing, please ensure you have the following prerequisites:
 
 # Installation
 
-To install the necessary requirements, first create a virtual environment in terminal using the commands below
+To install the necessary requirements, first create a Python virtual environment in your project's root directory by running the following commands in your terminal:
 ```bash
 python3 -m venv python3env --prompt "nac-venv"
 source python3env/bin/activate

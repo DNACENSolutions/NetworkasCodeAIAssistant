@@ -313,7 +313,7 @@ async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string
     const yamlLintPath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamlLintPath');
 
     let lintOutput = ["", ""];
-
+ 
     // ensure that vars file is YAML file
     if (varsFileExtension == 'yaml' || varsFileExtension == 'yml') {
         // run ansible-lint terminal command on vars file

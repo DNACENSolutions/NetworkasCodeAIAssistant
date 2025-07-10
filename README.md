@@ -73,9 +73,9 @@ python3 -m venv python3env --prompt "nac-venv"
 source python3env/bin/activate
 ```
 
-Next, download the `requirements.txt` file and run the following command:
+Next, download the requirements by running the following command:
 ```bash
-pip install -r requirements.txt
+pip install ansible ansible-runner dnacentersdk yamale ansible-lint yamllint jinja2
 ```
 
 ---

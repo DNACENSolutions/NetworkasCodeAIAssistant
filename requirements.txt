@@ -1,8 +1,0 @@
-python_version >= "3.9"
-ansible
-ansible-runner
-dnacentersdk
-yamale
-ansible-lint
-yamllint
-jinja2

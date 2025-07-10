@@ -21,7 +21,7 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 - **Validate YAML Code:** Use the `@assistant /validate` chat command to validate YAML code using Yamale, Ansible Lint, and YAMLlint.
 
 ### In-Editor Commands
-- **Validate & Lint:** Instantly run schema validation and linting on your open vars file, with AI-generated annotations for error fixing.
+- **Validate & Lint:** Instantly run schema validation and linting on your currently open vars file, with AI-generated annotations for error fixing.
 - **Run Playbook:** Execute the appropriate Ansible playbook for your task, automatically integrating with your Catalyst Center and generating comprehensive logs.
 
 ### Inline YAML Annotations
@@ -45,6 +45,8 @@ Below is a consolidated table of the provided commands / actions.
 | Validate & Lint ✔️              | Editor Menu  | Instantly run schema validation and linting on your open vars file, with AI-generated annotations for error fixing. |
 | Run Playbook ▶️                 | Editor Menu  | Execute the appropriate Ansible playbook for your task, integrating with Catalyst Center and generating comprehensive logs. |
 | Inline YAML Annotations         | Editor       | Receive inline suggestions and error messages based on "Validate & Lint" results. |
+
+*NOTE:* The `@assistant /validate` command creates a temporary file to run validation on, leaving your original files untouched. 
 
 ---
 
@@ -79,30 +81,7 @@ pip install -r requirements.txt
 
 # Setup
 
-If your project does not already have a `.vscode/settings.json` file, create one in the root of your workspace and set the following variables to the full paths of these executables.
-
-| Setting Name                        | Terminal Command to Find Path | Description                                  |
-|-------------------------------------|-------------------------------|----------------------------------------------|
-| `nac-copilot.ansibleLintPath`       | `where ansible-lint`          | Path to the `ansible-lint` executable        |
-| `nac-copilot.yamalePath`            | `where yamale`                | Path to the `yamale` executable              |
-| `nac-copilot.yamlLintPath`          | `where yamllint`              | Path to the `yamllint` executable            |
-| `nac-copilot.gitPath`               | `where git`                   | Path to the `git` executable                 |
-| `nac-copilot.ansiblePlaybookPath`   | `where ansible-playbook`      | Path to the `ansible-playbook` executable    |
-| `nac-copilot.venv`                  | `echo $VIRTUAL_ENV`           | Path to your Python virtual environment      |
-
-**Example `.vscode/settings.json`:**
-```json
-{
-  "nac-copilot.ansibleLintPath": "/usr/local/bin/ansible-lint",
-  "nac-copilot.yamalePath": "/usr/local/bin/yamale",
-  "nac-copilot.yamlLintPath": "/usr/local/bin/yamllint",
-  "nac-copilot.gitPath": "/usr/bin/git",
-  "nac-copilot.ansiblePlaybookPath": "/usr/local/bin/ansible-playbook",
-  "nac-copilot.venv": "/Users/youruser/your-venv-path"
-}
-```
-
-Next, download the `hosts.yaml` file and fill in the appropriate variables. 
+Download the `hosts.yaml` file and fill in the appropriate variables to integrate your Catalyst Center instance.
 
 Note that if there are spaces in the `ansible_python_interpreter` path, add `\` character in the space. For instance "/Users/dir name/ venv" becomes "Users/dir\ name/venv".
 
@@ -150,4 +129,5 @@ Below are some examples of this extension in action:
 ![Validate & Lint Success Example](images/validate-lint-success.png)
 
 ## In-Editor Commands - Run Playbook
+![Run Playbook Example - File Searching](images/run-playbook-file-search.png)
 ![Run Playbook Example](images/run-playbook.png)

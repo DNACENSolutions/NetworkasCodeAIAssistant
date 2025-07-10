@@ -31,13 +31,13 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
         }
     }
 
-    // identify vars file path from text editor or temp file path parameter 
+    // identify vars file path from text editor or temp file path parameter
     let varsFilePath = "";
     if (tempFilePath) {
         varsFilePath = tempFilePath;
     } else if (textEditor) {
         varsFilePath = textEditor.document.uri.fsPath;
-    }
+    } 
 
     // validation variables for Yamale annotations
     let validationFailed = false;
@@ -46,7 +46,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
     let formattedYamaleErrors: string[] = [];
     let successfulValidation = false;
 
-    // get Yamale path from user's configuration
+    // get Yamale path from settings.json configuration
     const yamalePath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamalePath');
 
     // run Yamale terminal command using validation schema and vars files
@@ -299,16 +299,16 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
  */
 async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
 
-    // identify vars file path from text editor or temp file path parameter 
+    // identify vars file path from text editor or temp file path parameter
     let varsFilePath = "";
     if (tempFilePath) {
         varsFilePath = tempFilePath;
     } else if (textEditor) {
         varsFilePath = textEditor.document.uri.fsPath;
-    }
+    } 
     const varsFileExtension = varsFilePath.split('.').pop()?.toLowerCase();
 
-    // get Ansible Lint & YAMLlint paths from user's configuration
+    // get Ansible Lint & YAMLlint paths from settings.json configuration
     const ansibleLintPath = vscode.workspace.getConfiguration('nac-copilot').get<string>('ansibleLintPath');
     const yamlLintPath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamlLintPath');
 

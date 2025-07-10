@@ -67,11 +67,6 @@
           "default": "ansible-lint",
           "description": "Path to the ansible-lint executable. Use 'ansible-lint' if it is in your PATH, or provide the full path."
         },
-        "nac-copilot.varsFilePath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the vars file. Please provide the full path."
-        },
         "nac-copilot.yamalePath": {
           "type": "string",
           "default": "yamale",

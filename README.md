@@ -23,10 +23,13 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 
 ### In-Editor Commands
 - **Validate & Lint:** Instantly run schema validation and linting on your currently open vars file, with AI-generated annotations for error fixing.
-- **Run Playbook:** Execute the appropriate Ansible playbook for your task, automatically integrating with your Catalyst Center and generating comprehensive logs.
+  - *Note:* This command requires that a vars file is open in the editor.
+- **Run Playbook:** Execute the appropriate Ansible playbook for your task by selecting the hosts, playbook, and vars files, with automatic Catalyst Center integration and detailed logs.
+  - *Note:* This command requires that a vars file exists in your project.
 
 ### Inline YAML Annotations
 - Receive inline suggestions and error messages directly in your editor based on validation and linting results.
+- This feature is available with the "Validate & Lint" command listed above
 
 ### Seamless GitHub Integration
 - Always access the latest workflows, playbooks, and schemas from the [catalyst-center-ansible-iac](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac) repository.
@@ -34,7 +37,7 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 
 ### Fast, Context-Aware Responses
 - Utilizes a Retrieval-Augmented Generation (RAG) approach for rapid, relevant answers.
-- *NOTE:* The first user prompt after activation or after a GitHub re-clone may take up to 30 seconds due to initialization; all other responses are typically delivered in ~3 seconds.
+- *NOTE:* The first user prompt after activation or after a GitHub re-clone may take around 30 seconds due to initialization; all other responses are typically delivered in ~3 seconds.
 
 Below is a consolidated table of the provided commands / actions.
 
@@ -107,7 +110,7 @@ catalyst_center_hosts:
             catalyst_center_api_task_timeout: 1200
             ansible_python_interpreter: '/Users/youruser/your-venv-path/bin/python'
 ```
-
+You are now ready to use all the commands and features of this extension! See the examples below for more detailed images of how to use these features.
 ---
 
 # Examples

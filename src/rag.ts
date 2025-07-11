@@ -31,6 +31,7 @@ async function indexDataRAG() {
             })));
         } else {
             // if no README found, add name of workflow as a single chunk
+            console.log(`No README present for workflow: ${w}`)
             chunks.push({
                 text: `Workflow: ${w}`,
                 metadata: { workflow: w }
@@ -192,6 +193,7 @@ async function fetchREADMEFiles() {
     // retrieve all workflows from cloned GitHub repo in user's workspace
     const workflowsDir = `${vscode.workspace.rootPath}/ai-assistant-catalyst-center-ansible-iac/workflows/`;
     const workflowNames = await fs.readdirSync(workflowsDir);
+    console.log(`Identified ${workflowNames.length} workflows in cloned GitHub repo`)
 
     // check if fetched READMEs includes all repo workflows
     if (workflows.length != 0 && workflowNames.every((w) => workflows.includes(w))) {
@@ -206,9 +208,6 @@ async function fetchREADMEFiles() {
         const readmeUri = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${w}/README.md`);
         if (readmeUri.length) {
             const readme = (await vscode.workspace.fs.readFile(vscode.Uri.file(readmeUri[0].fsPath))).toString();
-            // retrieve names of playbooks in workflow
-            const uris = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${w}/playbook/*_playbook.yml`);
-            const playbooks = uris.map(uri => uri.fsPath.replace(/^.*[\\/]/, ''));
 
             // add workflow & README to mapping
             workflowToREADMEs[w] = readme;

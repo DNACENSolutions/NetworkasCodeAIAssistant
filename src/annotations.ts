@@ -12,6 +12,8 @@ const decoratedLines = new Set<number>();
  * Returns Yamale output message.
  */
 async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
+    console.log("Checking file syntax with Yamale...");
+
     // handle case where workflow & validation_schema have not been identified
     if (!(workflow && validation_schema)) {
         vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
@@ -64,6 +66,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
                 for (const e of yamaleErrorOutput) {
                     error += e;
                 }
+                console.log("Yamale error output: ", error);
                 yamaleOutputMessage = error;
                 // if displaying annotations, notify user of validation error through error message
                 if (annotations) {
@@ -71,12 +74,14 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
                 }
             } else if (stdout.includes("Validation failed!")) {
                 const yamaleOutput = stdout.split('\n').filter(line => line.trim() !== '').slice(1);
-
+        
                 let error = "";
                 for (const e of yamaleOutput.slice(1)) {
                     error += e + "\n";
                     numSuggestions += 1;
                 }
+                console.log("Yamale validation error output: ", error);
+
                 yamaleOutputMessage = error;
                 // if displaying annotations, notify user of validation error through error message & output channel
                 if (annotations) {
@@ -110,6 +115,8 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
     if (annotations && textEditor) {
         // if validation failed, generate annotations based on Yamale output
         if (validationFailed && validationError) {
+            console.log("Validation failure detected, generating annotations...")
+
             // get sample vars files for later use
             const varsFiles = await getVarsFiles(workflow, true, playbook);
 
@@ -177,6 +184,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
                     // convert chatResponse to a list of strings
                     const accumulatedChatResponseList: string[] = JSON.parse(accumulatedChatResponse);
+                    console.log("Accumulated chat response received: ", accumulatedChatResponseList);
 
                     // retrieve line numbers for suggestions as a list
                     const lineNumbers = await yamaleAnnotationLines(formattedYamaleErrors, textEditor);
@@ -189,6 +197,8 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
                     if (lineNumbers.length === 0) {
                         response = "{}";
                     }
+
+                    console.log("Response from chat model w/ found line #s: ", response);
                     
                     // parse chat response to apply annotations to code
                     await parseChatResponse(response, textEditor);
@@ -230,6 +240,8 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
                 // else keep all parts
                 keyParts = parts;
             }
+
+            console.log("Key parts identified for annotation: ", keyParts);
 
             let currentLine = 1;
             for (const p of keyParts) {
@@ -289,6 +301,7 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
             lines.push(currentLine);
         }
     }
+    console.log("Identified line numbers for Yamale annotations: ", lines);
     return lines;
 }
 
@@ -298,6 +311,7 @@ async function yamaleAnnotationLines(response: string[], textEditor: vscode.Text
  * Returns YAMLlint & Ansible Lint output messages as a list of strings
  */
 async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
+    console.log("Checking file syntax with Ansible Lint & YAMLlint...");
 
     // identify vars file path from text editor or temp file path parameter
     let varsFilePath = "";
@@ -323,6 +337,7 @@ async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string
                 if (stdout) {
                     lintOutput[0] = stdout;
                     const ansibleLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
+                    console.log("Ansible Lint output: ", ansibleLintOutput);
 
                     // if displaying annotations & text editor available, generate annotations based on Ansible Lint output
                     if (annotations && textEditor) {
@@ -352,6 +367,7 @@ async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string
                 if (stdout) {
                     lintOutput[1] = stdout;
                     const yamlLintOutput = stdout.split('\n').filter(line => line.trim() !== '');
+                    console.log("YAMLlint output: ", yamlLintOutput);
 
                     // if displaying annotations & text editor available, generate annotations based on YAMLlint output
                     if (annotations && textEditor) {

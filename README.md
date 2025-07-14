@@ -110,7 +110,7 @@ catalyst_center_hosts:
             catalyst_center_api_task_timeout: 1200
             ansible_python_interpreter: '/Users/youruser/your-venv-path/bin/python'
 ```
-You are now ready to use all the commands and features of this extension! See the examples below for more detailed images of how to use these features.
+- You are now ready to use all the commands and features of this extension! See the examples below for more detailed images of how to use these features.
 ---
 
 # Examples

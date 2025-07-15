@@ -148,6 +148,14 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
         return "";
     }
 
+    // retrieve currently open file for context 
+    const textEditor = vscode.window.activeTextEditor;
+    let contextFile = ``;
+    if (textEditor) {
+        contextFile = textEditor.document.uri.fsPath;
+    }
+    console.log("Context files content: ", contextFile);
+
     // embed user query 
     const embeddings = await retrieveEmbeddings();
     const userQueryEmbedding = await embeddings.embedQuery(userQuery);
@@ -159,12 +167,15 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
     const topKChunks = topKResults.map((r: any) => r[0].pageContent);
 
     const prompt = `You are a helpful assistant. Your job is to answer any questions the user may have about Catalyst Center, Ansible, or anything generic that relates to whatever the user asks. 
-    Do not provide any code or YAML unless the user specifically asks for it.
     Try to be concise in your response to not overload the user with information. Format the response so it is easier to read.
     Be prepared to answer follow up questions and remember the previous questions and responses in the conversation.
+    If the user asks for code or code changes, provide the code in a code block with the language specified.    
 
     Here is some relevant information related to the user's prompt that may help you answer the question. HOWEVER, for more general questions, use your knowledge rather than this repo specific knowledge:
     \n${topKChunks}\n
+
+    Here is additional context from the currently open file in the user's workspace. Only use this if the user's question is related to the file / code in the file: 
+    \n${contextFile}\n
 
     Here is the user prompt: \n${request.prompt}\n`;
 

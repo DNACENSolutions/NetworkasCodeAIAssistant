@@ -9,6 +9,7 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Setup](#setup)
+- [LLM Model Performance - Playbook Classification](#llm-model-performance---playbook-classification)
 - [Examples](#examples)
 
 ---
@@ -110,7 +111,20 @@ catalyst_center_hosts:
             catalyst_center_api_task_timeout: 1200
             ansible_python_interpreter: '/Users/youruser/your-venv-path/bin/python'
 ```
-- You are now ready to use all the commands and features of this extension! See the examples below for more detailed images of how to use these features.
+- You are now ready to use all the commands and features of this extension! See the [examples](#examples) below for more detailed images of how to use these features.
+---
+
+# LLM Model Performance - Playbook Classification
+You may choose any Copilot LLM model available. The table below shows performance statistics to help you make an informed decision.
+
+  | Model                 | Average Response Time (s) | Accuracy (%) |
+  |-----------------------|---------------------------|------------------------|
+  | GPT-4.1 (baseline)    | 8                         | 84.33                  |
+  | Claude-3.5 (baseline) | 8                         | 91.79                  |
+  | RAG + GPT-4.1         | 3                         | 96.27                  |
+  | RAG + Claude-3.5      | 5                         | 96.27                  |
+
+*NOTE:* Claude-3.5 is included with the free version of GitHub Copilot, but GPT-4.1 is only available with the paid version of GitHub Copilot.
 ---
 
 # Examples

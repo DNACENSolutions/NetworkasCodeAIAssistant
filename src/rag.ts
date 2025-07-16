@@ -31,7 +31,7 @@ async function indexDataRAG() {
             })));
         } else {
             // if no README found, add name of workflow as a single chunk
-            console.log(`No README present for workflow: ${w}`)
+            console.log(`No README present for workflow: ${w}`);
             chunks.push({
                 text: `Workflow: ${w}`,
                 metadata: { workflow: w }
@@ -72,7 +72,7 @@ async function retrieveEmbeddings() {
             const output = await embedder(text, {pooling: 'mean', normalize: true});
             return Array.from(output.data);
         }
-    }
+    };
     return embeddings;
 }
 
@@ -124,7 +124,7 @@ async function retrieveAndGenerateRAGWorkflow(userQuery: string, k: number = 5, 
 
     // send request to Copilot LLM model
     try {
-        const chatResponse = await request.model.sendRequest(messages, {}, token)
+        const chatResponse = await request.model.sendRequest(messages, {}, token);
         let result = '';
         for await (const fragment of chatResponse.text) {
             result += fragment;
@@ -184,7 +184,7 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
 
     // send request to Copilot LLM model
     try {
-        const chatResponse = await request.model.sendRequest(messages, {}, token)
+        const chatResponse = await request.model.sendRequest(messages, {}, token);
         let result = '';
         for await (const fragment of chatResponse.text) {
             result += fragment;
@@ -204,10 +204,10 @@ async function fetchREADMEFiles() {
     // retrieve all workflows from cloned GitHub repo in user's workspace
     const workflowsDir = `${vscode.workspace.rootPath}/ai-assistant-catalyst-center-ansible-iac/workflows/`;
     const workflowNames = await fs.readdirSync(workflowsDir);
-    console.log(`Identified ${workflowNames.length} workflows in cloned GitHub repo`)
+    console.log(`Identified ${workflowNames.length} workflows in cloned GitHub repo`);
 
     // check if fetched READMEs includes all repo workflows
-    if (workflows.length != 0 && workflowNames.every((w) => workflows.includes(w))) {
+    if (workflows.length !== 0 && workflowNames.every((w) => workflows.includes(w))) {
         return;
     }
 

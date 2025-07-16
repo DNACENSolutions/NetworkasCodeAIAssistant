@@ -115,7 +115,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
     if (annotations && textEditor) {
         // if validation failed, generate annotations based on Yamale output
         if (validationFailed && validationError) {
-            console.log("Validation failure detected, generating annotations...")
+            console.log("Validation failure detected, generating annotations...");
 
             // get sample vars files for later use
             const varsFiles = await getVarsFiles(workflow, true, playbook);
@@ -135,6 +135,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
             - DO NOT include any ORDINAL words like "first", "second", "third" etc. in your response. Just provide the suggestion.
             - DO NOT reference the position or index of an entry in any way.
             - ONLY describe the fix needed, not WHERE it should be applied.
+            - DO NOT MAKE SUGGESTIONS ON INDENTATION
 
             Format each suggestion as an item in a list of strings. Do not include any text before or after the JSON objects. DO NOT omit the brackets at the beginning and end of the list.
             Here is an example of what your response should look like. MAKE SURE TO FOLLOW THIS EXACT FORMAT and just edit the suggestions:
@@ -329,7 +330,7 @@ async function ansibleYAMLLint(annotations: boolean = true, tempFilePath: string
     let lintOutput = ["", ""];
  
     // ensure that vars file is YAML file
-    if (varsFileExtension == 'yaml' || varsFileExtension == 'yml') {
+    if (varsFileExtension === 'yaml' || varsFileExtension === 'yml') {
         // run ansible-lint terminal command on vars file
         await new Promise<void>((resolve, reject) => {
             exec(`"${ansibleLintPath}" "${varsFilePath}"`, (error: any, stdout: string, stderr: string) => {
@@ -471,7 +472,7 @@ function getVisibleCodeWithLineNumbers(textEditor: vscode.TextEditor) {
 
     // iterate though all lines in text editor to get code by line number
 	for (let i = 0; i < totalLines; i++) {
-		code += `${i + 1}: ${textEditor.document.lineAt(i).text} \n`
+		code += `${i + 1}: ${textEditor.document.lineAt(i).text} \n`;
 	}
 
 	return code;

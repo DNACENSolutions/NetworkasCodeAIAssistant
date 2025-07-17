@@ -124,7 +124,7 @@ You may choose any Copilot LLM model available. The table below shows performanc
   | RAG + GPT-4.1         | 3                         | 96.27                  |
   | RAG + Claude-3.5      | 5                         | 96.27                  |
 
-*NOTE:* Claude-3.5 is included with the free version of GitHub Copilot, but GPT-4.1 is only available with the paid version of GitHub Copilot.
+- *NOTE:* Claude-3.5 is included with the free version of GitHub Copilot, but GPT-4.1 is only available with the paid version of GitHub Copilot.
 ---
 
 # Examples

@@ -37,7 +37,7 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 - *NOTE:* By default, the most updated version of the `catalyst-center-ansible-iac` repository is cloned. 
 
 ### Fast, Context-Aware Responses
-- Utilizes a Retrieval-Augmented Generation (RAG) approach for rapid, relevant answers.
+- Utilizes a Retrieval Augmented Generation (RAG) approach for rapid, relevant answers.
 - *NOTE:* The first user prompt after activation or after a GitHub re-clone may take around 30 seconds due to initialization; all other responses are typically delivered in ~3 seconds.
 
 Below is a consolidated table of the provided commands / actions.

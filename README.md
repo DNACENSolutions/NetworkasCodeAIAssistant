@@ -1,4 +1,4 @@
-# NaC Copilot README
+# Network as Code (NaC) AI Copilot README
 
 VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as Code)](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac/tree/main) workflows and playbooks to streamline and automate network management on Catalyst Center.
 

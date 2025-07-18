@@ -82,6 +82,16 @@ Next, download the requirements by running the following command:
 pip install ansible ansible-runner dnacentersdk yamale ansible-lint yamllint jinja2
 ```
 
+Clone the dnacenter-ansible repository:
+```bash
+ansible-galaxy collection install cisco.dnac --force
+```
+
+Lastly, set the `ANSIBLE_PYTHON_INTERPRETER` variable:
+```bash
+export ANSIBLE_PYTHON_INTERPRETER=$(which python)
+```
+
 ---
 
 # Setup

@@ -20,7 +20,10 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 - **Generate YAML Code:** Use the `@assistant` chat assistant to generate YAML vars files tailored to your task by identifying the best workflow, playbook, and schema.
 - **Ask Questions:** Use the `@assistant /ask` chat command to get answers to general and technical questions about Catalyst Center, Ansible, and related topics.
 - **Validate YAML Code:** Use the `@assistant /validate` chat command to validate YAML code using Yamale, Ansible Lint, and YAMLlint.
-- *NOTE:* Make sure to select the "Ask" mode in the GitHub Copilot chat to be able to use these chat commands.
+- Leverages GitHub Copilot chat to provide additional assistance & features.
+*Notes*:
+- *Important:* Make sure to select the "Ask" mode in the GitHub Copilot chat to be able to use these chat commands.
+- `@assistant` is only for identifying the playbook & generating vars file code for a user task. To modify existing code, use `@assistant /ask` and provide the relevant file as context.
 
 ### In-Editor Commands
 - **Validate & Lint:** Instantly run schema validation and linting on your currently open vars file, with AI-generated annotations for error fixing.

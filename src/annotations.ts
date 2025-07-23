@@ -16,7 +16,11 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
     // handle case where workflow & validation_schema have not been identified
     if (!(workflow && validation_schema)) {
+        if (!validation_schema && workflow) {
+            vscode.window.showErrorMessage("Validation schema is not available for the identified workflow.");
+        } else {
         vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
+        }
         return [];
     }
 

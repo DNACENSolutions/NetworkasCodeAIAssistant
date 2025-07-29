@@ -7,7 +7,6 @@ VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as 
 # Table of Contents
 - [Features](#features)
 - [Prerequisites](#prerequisites)
-- [Installation](#installation)
 - [Setup](#setup)
 - [LLM Model Performance - Playbook Classification](#llm-model-performance---playbook-classification)
 - [Examples](#examples)
@@ -70,34 +69,11 @@ Before continuing, please ensure you have the following prerequisites:
 
 ---
 
-# Installation
-
-To install the necessary requirements, first create a Python virtual environment in your project's root directory by running the following commands in your terminal:
-```bash
-python3 -m venv python3env --prompt "nac-venv"
-source python3env/bin/activate
-```
-
-Next, download the requirements by running the following command:
-```bash
-pip install ansible ansible-runner dnacentersdk yamale ansible-lint yamllint jinja2
-```
-
-Clone the dnacenter-ansible repository:
-```bash
-ansible-galaxy collection install cisco.dnac --force
-```
-
-Lastly, set the `ANSIBLE_PYTHON_INTERPRETER` variable:
-```bash
-export ANSIBLE_PYTHON_INTERPRETER=$(which python)
-```
-
----
-
 # Setup
 
-Download the `hosts.yaml` file and fill in the appropriate variables to integrate your Catalyst Center instance.
+Before installing or activating the extension, open or create your desired project folder in VS Code. The extension will automatically create the Python virtual environment, install all required dependencies, and generate the necessary settings files for you.
+
+Next, download the `hosts.yaml` file and fill in the appropriate variables to integrate your Catalyst Center instance.
 
 Note that if there are spaces in the `ansible_python_interpreter` path, add `\` character in the space. For instance "/Users/dir name/ venv" becomes "Users/dir\ name/venv".
 

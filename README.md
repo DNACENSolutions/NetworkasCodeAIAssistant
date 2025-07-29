@@ -71,7 +71,7 @@ Before continuing, please ensure you have the following prerequisites:
 
 # Setup
 
-Before installing or activating the extension, open or create your desired project folder in VS Code. The extension will automatically create the Python virtual environment, install all required dependencies, and generate the necessary settings files for you.
+**Important:** Before installing or activating the extension, open or create your desired project folder in VS Code. The extension will automatically create the Python virtual environment, install all required dependencies, and generate the necessary settings files for you.
 
 Next, download the `hosts.yaml` file and fill in the appropriate variables to integrate your Catalyst Center instance.
 

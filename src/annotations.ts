@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { exec } from 'child_process';
-import { workflow, validation_schema, validation_schema_file, playbook, getVarsFiles } from './extension.js';
+import { workflow, validation_schema, validation_schema_file, playbook, getVarsFiles, sequentialTasks, sequentialPlaybooks, selectValidationSchema } from './extension.js';
 
 // global state variables shared across annotations functions
 let activeDecorations: vscode.TextEditorDecorationType[] = []; 
@@ -14,9 +14,35 @@ const decoratedLines = new Set<number>();
 async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
     console.log("Checking file syntax with Yamale...");
 
+    // if sequential tasks have been identified, provide playbook options to user (to identify validation schema)
+    if (sequentialTasks) {
+        // add steps to sequential playbooks to make it easier for user to identify
+        for (let i = 0; i < sequentialPlaybooks.length; i++) {
+            if (!sequentialPlaybooks[i].includes("Step")) {
+                sequentialPlaybooks[i] = `Step ${i + 1}: ${sequentialPlaybooks[i]}`;
+            }
+        }
+
+        // create quick pick menu to allow user to select a playbook for validation
+        const selectedPlaybook = await vscode.window.showQuickPick(sequentialPlaybooks, {
+            placeHolder: "Select a playbook to validate your vars file against",
+            matchOnDescription: true
+        });
+
+        // retrieve full playbook path to identify workflow
+        const formattedPlaybook = selectedPlaybook ? selectedPlaybook.replace(/Step \d+: /, '') : '';
+        console.log("Path to find playbook: ", `**/ai-assistant-catalyst-center-ansible-iac/**/playbook/${formattedPlaybook}`)
+        const playbookUri = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/**/playbook/${formattedPlaybook}`);
+        const fullPlaybookPath = playbookUri[0].fsPath;
+        const taskWorkflow = fullPlaybookPath.split('/workflows/')[1].split('/')[0];
+
+        // identify validation schema file and content based on user selection
+        const val_schema = selectValidationSchema(taskWorkflow);
+    }
+
     // handle case where workflow & validation_schema have not been identified
-    if (!(workflow && validation_schema)) {
-        if (!validation_schema && workflow) {
+    if (!(workflow && validation_schema_file)) {
+        if (!validation_schema_file && workflow) {
             vscode.window.showErrorMessage("Validation schema is not available for the identified workflow.");
         } else {
         vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");

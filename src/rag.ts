@@ -116,7 +116,7 @@ async function retrieveAndGenerateRAGWorkflow(userQuery: string, k: number = 5, 
 
     Here is an example response: site_hierarchy\n
     Here is another example response: swim \n
-    Here is the user prompt: \n${request.prompt}\n`;
+    Here is the user prompt: \n${userQuery}\n`;
 
     // send prompt to LLM & parse result
     const messages = [vscode.LanguageModelChatMessage.User(prompt)];
@@ -177,7 +177,7 @@ async function retrieveAndGenerateRAGGeneral(userQuery: string, k: number = 5, r
     Here is additional context from the currently open file in the user's workspace. Only use this if the user's question is related to the file / code in the file: 
     \n${contextFile}\n
 
-    Here is the user prompt: \n${request.prompt}\n`;
+    Here is the user prompt: \n${userQuery}\n`;
 
     // send prompt to LLM & parse result
     const messages = [vscode.LanguageModelChatMessage.User(prompt)];

@@ -13,6 +13,7 @@ const decoratedLines = new Set<number>();
  */
 async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
     console.log("Checking file syntax with Yamale...");
+    let validationFilePath = "";
 
     // if sequential tasks have been identified, provide playbook options to user (to identify validation schema)
     if (sequentialTasks) {
@@ -31,35 +32,38 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
         // retrieve full playbook path to identify workflow
         const formattedPlaybook = selectedPlaybook ? selectedPlaybook.replace(/Step \d+: /, '') : '';
-        console.log("Path to find playbook: ", `**/ai-assistant-catalyst-center-ansible-iac/**/playbook/${formattedPlaybook}`)
         const playbookUri = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/**/playbook/${formattedPlaybook}`);
         const fullPlaybookPath = playbookUri[0].fsPath;
         const taskWorkflow = fullPlaybookPath.split('/workflows/')[1].split('/')[0];
 
         // identify validation schema file and content based on user selection
-        const val_schema = selectValidationSchema(taskWorkflow);
-    }
-
-    // handle case where workflow & validation_schema have not been identified
-    if (!(workflow && validation_schema_file)) {
-        if (!validation_schema_file && workflow) {
-            vscode.window.showErrorMessage("Validation schema is not available for the identified workflow.");
-        } else {
-        vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
+        const uris = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${taskWorkflow}/schema/*_schema.yml`);
+        const fileNames = uris.map(uri => uri.fsPath);
+        if (fileNames.length !== 0 && fileNames[0]) {
+            validationFilePath = fileNames[0];
         }
-        return [];
-    }
+    } else {
+        // else handle singular vars file validation
+        // handle case where workflow & validation_schema have not been identified
+        if (!(workflow && validation_schema_file)) {
+            if (!validation_schema_file && workflow) {
+                vscode.window.showErrorMessage("Validation schema is not available for the identified workflow.");
+            } else {
+            vscode.window.showErrorMessage("Please use @assistant chat feature to identify playbook before performing validation.");
+            }
+            return [];
+        }
 
-    // get schema validation file path from cloned GitHub repo in user's workspace
-    let validationFilePath = "";
-    const uris = await vscode.workspace.findFiles("**/ai-assistant-catalyst-center-ansible-iac/**/*_schema.yml");
-    const fileNames = uris.map(uri => uri.fsPath);
+        // get schema validation file path from cloned GitHub repo in user's workspace
+        const uris = await vscode.workspace.findFiles("**/ai-assistant-catalyst-center-ansible-iac/**/*_schema.yml");
+        const fileNames = uris.map(uri => uri.fsPath);
 
-    // identify schema file path from all file paths 
-    for (const f of fileNames) {
-        if (f.includes(validation_schema_file)) {
-            validationFilePath = f;
-            break;
+        // identify schema file path from all file paths 
+        for (const f of fileNames) {
+            if (f.includes(validation_schema_file)) {
+                validationFilePath = f;
+                break;
+            }
         }
     }
 

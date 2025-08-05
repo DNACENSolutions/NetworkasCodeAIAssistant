@@ -11,12 +11,15 @@ const decoratedLines = new Set<number>();
  * Retrieves validation schema file, runs yamale command on vars file, and generates annotations based on yamale output.
  * Returns Yamale output message.
  */
-async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor): Promise<string[]> {
+async function yamale(annotations: boolean = true, tempFilePath: string = "", textEditor?: vscode.TextEditor, valPath: string = ""): Promise<string[]> {
     console.log("Checking file syntax with Yamale...");
     let validationFilePath = "";
 
+    console.log("Sequential tasks?: ", sequentialTasks);
+    console.log("Sequential playbooks: ", sequentialPlaybooks);
+
     // if sequential tasks have been identified, provide playbook options to user (to identify validation schema)
-    if (sequentialTasks) {
+    if (sequentialTasks && valPath == "") {
         // add steps to sequential playbooks to make it easier for user to identify
         for (let i = 0; i < sequentialPlaybooks.length; i++) {
             if (!sequentialPlaybooks[i].includes("Step")) {

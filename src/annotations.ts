@@ -41,10 +41,22 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
         // identify validation schema file and content based on user selection
         const uris = await vscode.workspace.findFiles(`**/ai-assistant-catalyst-center-ansible-iac/workflows/${taskWorkflow}/schema/*_schema.yml`);
-        const fileNames = uris.map(uri => uri.fsPath);
+        let fileNames = uris.map(uri => uri.fsPath);
+
+        // if playbook includes "delete", schema should include "delete" in name
+        if (formattedPlaybook.includes('delete')) {
+            fileNames = fileNames.filter(file => file.includes('delete'));
+        } else {
+            fileNames = fileNames.filter(file => !file.includes('delete'));
+        }
+
         if (fileNames.length !== 0 && fileNames[0]) {
             validationFilePath = fileNames[0];
         }
+
+    } else if (sequentialTasks && valPath != "") {
+        // if sequential tasks have been identified and validation path is provided, use it
+        validationFilePath = valPath;
     } else {
         // else handle singular vars file validation
         // handle case where workflow & validation_schema have not been identified
@@ -87,6 +99,8 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
 
     // get Yamale path from settings.json configuration
     const yamalePath = vscode.workspace.getConfiguration('nac-copilot').get<string>('yamalePath');
+
+    console.log(`Running Yamale validation on ${varsFilePath} with schema ${validationFilePath}...`);
 
     // run Yamale terminal command using validation schema and vars files
     let yamaleOutputMessage: string = "";

@@ -1,4 +1,4 @@
-# Network as Code (NaC) AI Copilot README
+# Network as Code (NaC) AI Assistant README
 
 VS Code extension that utilizes [Catalyst Center Ansible IaC (Infrastructure as Code)](https://github.com/cisco-en-programmability/catalyst-center-ansible-iac/tree/main) workflows and playbooks to streamline and automate network management on Catalyst Center.
 
@@ -58,6 +58,7 @@ Below is a consolidated table of the provided commands / actions.
 # Important Note
 
 - As mentioned above in the features, the latest version of the `catalyst-center-ansible-iac` repository is automatically cloned into your workspace as `ai-assistant-catalyst-center-ansible-iac`. **Please do not modify this folder**, as it is managed by the extension and used to support its functionality.
+- This cloned folder will be automatically updated to reflect new changes and workflows.
 
 ---
 
@@ -66,52 +67,21 @@ Below is a consolidated table of the provided commands / actions.
 Before continuing, please ensure you have the following prerequisites:
 - Access to a Cisco Catalyst Center instance
 - Proper network connectivity to utilize and interact with Cisco Catalyst Center
+- Access to GitHub Copilot
+- A project folder in VS Code  
 
 ---
 
 # Setup
-
-**Important:** Before installing or activating the extension, open or create your desired project folder in VS Code. The extension will automatically create the Python virtual environment, install all required dependencies, and generate the necessary settings files for you.
-
-Next, download the `hosts.yaml` file and fill in the appropriate variables to integrate your Catalyst Center instance.
-
-Note that if there are spaces in the `ansible_python_interpreter` path, add `\` character in the space. For instance "/Users/dir name/ venv" becomes "Users/dir\ name/venv".
-
-**Example `hosts.yaml`:**
-```yaml
----
-catalyst_center_hosts:
-    hosts:
-        catalyst_center220:
-            catalyst_center_host: 10.111.222.33
-            catalyst_center_password: password
-            catalyst_center_port: 443
-            catalyst_center_timeout: 60
-            catalyst_center_username: user
-            catalyst_center_version: 2.3.7.9
-            catalyst_center_verify: false
-            catalyst_center_debug: true
-            catalyst_center_log_level: DEBUG
-            catalyst_center_log: true
-            catalyst_center_log_append: false
-            catalyst_center_log_file_path: "dnac_log.log"
-            catalyst_center_api_task_timeout: 1200
-            ansible_python_interpreter: '/Users/youruser/your-venv-path/bin/python'
-```
+- The setup (environment creation, dependency installation, data & inventory folder creation) has been automated, so please wait about **1 minute** for the setup process to finish.
+- **Important:** After setup is complete, make sure to update the `hosts.yaml` file under the newly created `ansible_inventory/catalystcenter_inventory` folder in your VS Code project's root directory.
 - You are now ready to use all the commands and features of this extension! See the [examples](#examples) below for more detailed images of how to use these features.
+  
 ---
 
 # LLM Model Performance - Playbook Classification
-You may choose any Copilot LLM model available. The table below shows performance statistics to help you make an informed decision.
+You may choose any Copilot LLM model available. Both GPT-4.1 and Claude-3.5 have the same playbook classification accuracy (96.27%). (Note that Claude-3.5 is included with the free version of GitHub Copilot, but GPT-4.1 is only available with the paid version.)
 
-  | Model                 | Average Response Time (s) | Accuracy (%) |
-  |-----------------------|---------------------------|------------------------|
-  | GPT-4.1 (baseline)    | 8                         | 84.33                  |
-  | Claude-3.5 (baseline) | 8                         | 91.79                  |
-  | RAG + GPT-4.1         | 3                         | 96.27                  |
-  | RAG + Claude-3.5      | 5                         | 96.27                  |
-
-- *NOTE:* Claude-3.5 is included with the free version of GitHub Copilot, but GPT-4.1 is only available with the paid version of GitHub Copilot.
 ---
 
 # Examples

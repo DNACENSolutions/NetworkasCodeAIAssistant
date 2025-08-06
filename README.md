@@ -88,13 +88,19 @@ You may choose any Copilot LLM model available. Both GPT-4.1 and Claude-3.5 have
 
 Below are some examples of this extension in action:
 
-## AI-Powered Chat Assistance - Generate YAML code
+## AI-Powered Chat Assistance - Generate YAML Code
 ![Generating YAML Code Example](images/gen-code.png)
 
-## AI-Powered Chat Assistance - Ask questions
+## AI-Powered Chat Assistance - Generate YAML Code for Multiple Tasks
+![Generating YAML Code Example - Multiple Tasks](images/gen-code-multiple.png)
+
+## AI-Powered Chat Assistance - Generate YAML Code for Multiple Tasks Out of Order
+![Generating YAML Code Example - Multiple Tasks Out of Order](images/gen-code-order.png)
+
+## AI-Powered Chat Assistance - Ask Questions
 ![Asking Questions Example](images/q&a.png)
 
-## AI-Powered Chat Assistance - Validate YAML code
+## AI-Powered Chat Assistance - Validate YAML Code
 ![Validating YAML Code Example](images/validate-code.png)
 
 ## In-Editor Commands - Validate & Lint Failure with Inline YAML Annotations

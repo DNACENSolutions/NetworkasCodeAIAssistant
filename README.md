@@ -68,7 +68,7 @@ Before continuing, please ensure you have the following prerequisites:
 - Access to a Cisco Catalyst Center instance
 - Proper network connectivity to utilize and interact with Cisco Catalyst Center
 - Access to GitHub Copilot
-- A project folder in VS Code  
+- A project folder open in VS Code  
 
 ---
 

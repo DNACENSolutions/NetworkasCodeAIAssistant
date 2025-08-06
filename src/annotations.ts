@@ -44,7 +44,7 @@ async function yamale(annotations: boolean = true, tempFilePath: string = "", te
         let fileNames = uris.map(uri => uri.fsPath);
 
         // if playbook includes "delete", schema should include "delete" in name
-        if (formattedPlaybook.includes('delete')) {
+        if (fileNames.length > 1 && formattedPlaybook.includes('delete')) {
             fileNames = fileNames.filter(file => file.includes('delete'));
         } else {
             fileNames = fileNames.filter(file => !file.includes('delete'));

@@ -1,12 +1,14 @@
 {
   "name": "nac-copilot",
-  "displayName": "NaC_CoPilot",
-  "description": "Network as Code (NaC) CoPilot",
+  "displayName": "NaC AI Assistant",
+  "description": "VS Code extension that utilizes Catalyst Center Ansible IaC (Infrastructure as Code) workflows and playbooks to streamline and automate network management on Catalyst Center.",
+  "publisher": "cisco-vscode-solutions",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yamrao/nac-ai-copilot.git"
+    "url": "https://github.com/DNACENSolutions/NetworkasCodeAIAssistant.git"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "icon": "images/icon.png",
   "type": "module",
   "engines": {
     "vscode": "^1.100.2"

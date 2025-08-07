@@ -17,7 +17,7 @@ export let playbook = "";
 export let sequentialTasks = false;
 export let sequentialPlaybooks: string[] = [];
 let initializationPromiseRAG: Promise<void> | null = null;
-let initializationPromiseEnv: Promise<void> | null = null;
+// let initializationPromiseEnv: Promise<void> | null = null;
 let lastGitHubCloneCheck = new Date(0);
 
 // initialized variable for user's virtual environment path 
@@ -30,18 +30,18 @@ let env = { ...process.env };
 export async function activate(context: vscode.ExtensionContext) {
 	console.log("NaC AI Copilot extension activated!");
 	
-	// send message to user to wait while extension setup is in progress
-	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    statusBar.text = "NaC AI Copilot: Setting up environment...";
-    statusBar.show();
+	// // send message to user to wait while extension setup is in progress
+	// const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+    // statusBar.text = "NaC AI Copilot: Setting up environment...";
+    // statusBar.show();
 
-	// automate venv creation, dependency installation, and settings.json generation
-	initializationPromiseEnv = envSetup().then(() => {
-        statusBar.hide();
-    });
+	// // automate venv creation, dependency installation, and settings.json generation
+	// initializationPromiseEnv = envSetup().then(() => {
+    //     statusBar.hide();
+    // });
 
-	// add relevant NaC folders/files to user's workspace
-	await createNaCFiles();
+	// // add relevant NaC folders/files to user's workspace
+	// await createNaCFiles();
 
 	// register chat participant 
 	const participant = vscode.chat.createChatParticipant('chat-tutorial.code-assistant', handler);
@@ -52,10 +52,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		'validate-and-lint',
 		async (textEditor: vscode.TextEditor) => {
 			// wait for envSetup to complete before running validation and linting
-			if (initializationPromiseEnv) {
-				await initializationPromiseEnv;
-				initializationPromiseEnv = null; 
-			}
+			// if (initializationPromiseEnv) {
+			// 	await initializationPromiseEnv;
+			// 	initializationPromiseEnv = null; 
+			// }
 
 			// send message to user that validation is in progress
 			vscode.window.withProgress({
@@ -79,10 +79,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		'run-playbook',
 		async(textEditor: vscode.TextEditor) => {
 			// wait for envSetup to complete before running validation and linting
-			if (initializationPromiseEnv) {
-				await initializationPromiseEnv;
-				initializationPromiseEnv = null;
-			}
+			// if (initializationPromiseEnv) {
+			// 	await initializationPromiseEnv;
+			// 	initializationPromiseEnv = null;
+			// }
 
 			// send message to user that Ansible playbook is being run
 			vscode.window.withProgress({
@@ -698,19 +698,25 @@ const handler: vscode.ChatRequestHandler = async (
 	stream: vscode.ChatResponseStream,
 	token: vscode.CancellationToken,
 ) => {
-	// wait for envSetup() function to complete
-	if (initializationPromiseEnv) {
-		// send message to user that environment setup is in progress
-		vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			title: "Setting up environment. Please wait...",
-			cancellable: false
-		}, async () => {
-			await initializationPromiseEnv;
-		});
-		await initializationPromiseEnv;
-		initializationPromiseEnv = null;
-	}
+	// // wait for envSetup() function to complete
+	// if (initializationPromiseEnv) {
+	// 	// send message to user that environment setup is in progress
+	// 	vscode.window.withProgress({
+	// 		location: vscode.ProgressLocation.Notification,
+	// 		title: "Setting up environment. Please wait...",
+	// 		cancellable: false
+	// 	}, async () => {
+	// 		await initializationPromiseEnv;
+	// 	});
+	// 	await initializationPromiseEnv;
+	// 	initializationPromiseEnv = null;
+	// }
+
+	// set user's virtual environment variables
+	env = { ...process.env };
+	env.PATH = `${vscode.workspace.rootPath}/python3env/bin:${env.PATH}`;
+	env.VIRTUAL_ENV = `${vscode.workspace.rootPath}/python3env`;
+
 
 	// wait for initializeRAG() function to complete
 	if (initializationPromiseRAG) {

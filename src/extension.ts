@@ -285,11 +285,11 @@ async function createNaCFiles() {
 async function initializeRAG() {
 	console.log("RAG initialization started...");
 
-	// wait for environment setup to complete before proceeding
-	if (initializationPromiseEnv) {
-		await initializationPromiseEnv;
-		initializationPromiseEnv = null;
-	}
+	// // wait for environment setup to complete before proceeding
+	// if (initializationPromiseEnv) {
+	// 	await initializationPromiseEnv;
+	// 	initializationPromiseEnv = null;
+	// }
 
 	// clone GitHub repo if any files are missing
 	await cloneGitHubRepo();

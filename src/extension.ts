@@ -17,7 +17,6 @@ export let playbook = "";
 export let sequentialTasks = false;
 export let sequentialPlaybooks: string[] = [];
 let initializationPromiseRAG: Promise<void> | null = null;
-let initializationPromiseEnv: Promise<void> | null = null;
 let lastGitHubCloneCheck = new Date(0);
 
 // initialized variable for user's virtual environment path 
@@ -29,19 +28,6 @@ let env = { ...process.env };
  */
 export async function activate(context: vscode.ExtensionContext) {
 	console.log("NaC AI Copilot extension activated!");
-	
-	// send message to user to wait while extension setup is in progress
-	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-    statusBar.text = "NaC AI Copilot: Setting up environment...";
-    statusBar.show();
-
-	// automate venv creation, dependency installation, and settings.json generation
-	initializationPromiseEnv = envSetup().then(() => {
-        statusBar.hide();
-    });
-
-	// add relevant NaC folders/files to user's workspace
-	await createNaCFiles();
 
 	// register chat participant 
 	const participant = vscode.chat.createChatParticipant('chat-tutorial.code-assistant', handler);
@@ -52,10 +38,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		'validate-and-lint',
 		async (textEditor: vscode.TextEditor) => {
 			// wait for envSetup to complete before running validation and linting
-			if (initializationPromiseEnv) {
-				await initializationPromiseEnv;
-				initializationPromiseEnv = null; 
-			}
+			await checkSetupAutomation();
 
 			// send message to user that validation is in progress
 			vscode.window.withProgress({
@@ -78,11 +61,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	const runPlaybook = vscode.commands.registerTextEditorCommand(
 		'run-playbook',
 		async(textEditor: vscode.TextEditor) => {
-			// wait for envSetup to complete before running validation and linting
-			if (initializationPromiseEnv) {
-				await initializationPromiseEnv;
-				initializationPromiseEnv = null;
-			}
+			// wait for envSetup to complete before running playbook
+			await checkSetupAutomation();
 
 			// send message to user that Ansible playbook is being run
 			vscode.window.withProgress({
@@ -98,6 +78,54 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// initialize RAG approach in the background
 	initializationPromiseRAG = initializeRAG();
+}
+
+/**
+ * Checks whether setup has been automted already (venv created, dependencies installed, settings.json generated).
+ * If not, and a new project has been created, automates the setup process again.
+ */
+async function checkSetupAutomation() {
+	// check whether all dependencies have been installed
+	const requiredDependencies = [
+        'ansible',
+        'ansible-runner',
+        'yamale',
+        'ansible-lint',
+        'yamllint'
+    ]
+	const missingDependencies: string[] = [];
+
+	// find appropraite command based on Windows vs. macOS/Linux platform
+	const cmd = process.platform === 'win32' ? 'where' : 'which';
+
+	// loop through required dependencies and check if they are installed using terminal "where" command
+	for (const d of requiredDependencies) {
+		await new Promise<void>((resolve, reject) => {
+			exec(`${cmd} ${d}`, { env }, (error: any, stdout: string, stderr: string) => {
+				if (error) {
+					console.error(`Error retrieving path of dependency ${d}: ${error.message}`);
+					missingDependencies.push(d);
+				}
+				resolve();
+			});
+		});
+	}
+
+	// check if python environment has not been created or dependencies have not been installed
+	if (!fs.existsSync(`${vscode.workspace.rootPath}/python3env`) || missingDependencies.length > 0) {
+		// send message to user that environment setup is in progress
+		vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			title: "Setting up environment. Please wait...",
+			cancellable: false
+		}, async () => {
+			// automate venv creation, dependency installation, and settings.json generation
+			await envSetup();
+
+			// add relevant NaC folders/files to user's workspace
+			await createNaCFiles();
+		});
+	}
 }
 
 /**
@@ -284,12 +312,6 @@ async function createNaCFiles() {
  */
 async function initializeRAG() {
 	console.log("RAG initialization started...");
-
-	// wait for environment setup to complete before proceeding
-	if (initializationPromiseEnv) {
-		await initializationPromiseEnv;
-		initializationPromiseEnv = null;
-	}
 
 	// clone GitHub repo if any files are missing
 	await cloneGitHubRepo();
@@ -698,19 +720,8 @@ const handler: vscode.ChatRequestHandler = async (
 	stream: vscode.ChatResponseStream,
 	token: vscode.CancellationToken,
 ) => {
-	// wait for envSetup() function to complete
-	if (initializationPromiseEnv) {
-		// send message to user that environment setup is in progress
-		vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			title: "Setting up environment. Please wait...",
-			cancellable: false
-		}, async () => {
-			await initializationPromiseEnv;
-		});
-		await initializationPromiseEnv;
-		initializationPromiseEnv = null;
-	}
+	// check whether environment setup has been automated in this project already
+	await checkSetupAutomation();
 
 	// wait for initializeRAG() function to complete
 	if (initializationPromiseRAG) {

@@ -77,7 +77,7 @@ Before continuing, please ensure you have the following prerequisites:
 - **Important:** After setup is complete, make sure to update the `hosts.yaml` file under the newly created `ansible_inventory/catalystcenter_inventory` folder in your VS Code project's root directory.
 - You are now ready to use all the commands and features of this extension! See the [examples](#examples) below for more detailed images of how to use these features.
 
-- If you run into any additional issues, with the extension, try executing the following terminal commands and reloading your VS Code window (Command + Shift + P —> Developer: Reload Window). The version_number below refers to the extension version number you are currently using (e.g. 0.0.4)
+- **NOTE:** If you run into any additional issues, with the extension, try executing the following terminal commands and reloading your VS Code window (Command + Shift + P —> "Developer: Reload Window"). The version_number below refers to the extension version number you are currently using (e.g. 0.0.4)
 ```
 cd ~/.vscode/extensions/cisco-vscode-solutions.nac-copilot-<version_number>
 npm install --platform=darwin --arch=arm64 sharp        

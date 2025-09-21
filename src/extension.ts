@@ -261,30 +261,27 @@ async function getDependencyPath(dependency: string): Promise<string> {
 async function createNaCFiles() {
 	// create inventory folder and empty hosts.yml file
 	const hostsFilePath = `${vscode.workspace.rootPath}/ansible_inventory/catalystcenter_inventory/hosts.yaml`;
-	const hostsContent = `
----
+	const hostsContent = `---
 catalyst_center_hosts:
-    hosts:
-        catalyst_center220:
-            # (Mandatory) CatC Ip address
-            catalyst_center_host: <DNAC IP Address>
-            # (Mandatory) CatC UI admin Password
-            catalyst_center_password: <DNAC UI admin Password>
-            catalyst_center_port: 443
-            catalyst_center_timeout: 60
-            # (Mandatory) CatC UI admin username
-            catalyst_center_username: <DNAC UI admin username>
-            catalyst_center_verify: false
-            # (Mandatory) DNAC Release version
-            catalyst_center_version: <DNAC Release version>
-            catalyst_center_debug: true
-            catalyst_center_log_level: INFO
-            catalyst_center_log: true
-            # (Optional) Python interpreter path, use the CLI to find venv:
-            # python -c "import sys; print(sys.executable)"
-            ansible_python_interpreter: <your python interpreter path>
-            
-            `;
+  hosts:
+    catalyst_center220:
+      # (Mandatory) CatC Ip address
+      catalyst_center_host: <DNAC IP Address>
+      # (Mandatory) CatC UI admin Password
+      catalyst_center_password: <DNAC UI admin Password>
+      catalyst_center_port: 443
+      catalyst_center_timeout: 60
+      # (Mandatory) CatC UI admin username
+      catalyst_center_username: <DNAC UI admin username>
+      catalyst_center_verify: false
+      # (Mandatory) DNAC Release version
+      catalyst_center_version: <DNAC Release version>
+      catalyst_center_debug: true
+      catalyst_center_log_level: INFO
+      catalyst_center_log: true
+      # (Optional) Python interpreter path, use this to find your venv path:
+      # python -c "import sys; print(sys.executable)"
+      ansible_python_interpreter: <your python interpreter path>`;
 
 	// create inventory directory if it doesn't exist 
 	if (!fs.existsSync(`${vscode.workspace.rootPath}/ansible_inventory/catalystcenter_inventory`)) {
